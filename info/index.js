@@ -99,7 +99,7 @@ window.INFO = {
   {
    "name": "frontier",
    "image": "info/pfp/20.png",
-   "list": "Artist\nTriangle\nSquare\nEgg"
+   "list": "Top 10\nTop 5\nArtist\nGem\nAlpha Pentagon\nBeta Pentagon\nPentagon\nTriangle\nSquare\nEgg"
   },
   {
    "name": "the very magnificent b",
