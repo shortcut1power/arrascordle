@@ -123,17 +123,5 @@ window.INFO = {
   }
  ],
  "music": [
-  {
-   "name": "Ablaze",
-   "file": "info/music/Ablaze.mp3"
-  },
-  {
-   "name": "Indifferent",
-   "file": "info/music/Indifferent.mp3"
-  },
-  {
-   "name": "Prophet Stimulant",
-   "file": "info/music/Prophet Stimulant.mp3"
-  }
  ]
 };
