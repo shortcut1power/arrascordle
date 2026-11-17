@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arrascordle</title>
+<script>try{if(localStorage.getItem('arrascordle-theme')==='light')document.documentElement.dataset.theme='light'}catch(e){}</script>
+<style>
+  :root {
+    --bg:#1f232a; --line:#343840; --card:#15181d; --btn:#171a1f; --btn-b:#1c2026; --btn-h:#1d2127; --btn-a:#12151a;
+    --dis:#7d828b; --muted:#8d9096; --row:#181b20; --sub:#c3c8d3; --dash:#3a3f48; --dim:#6f747d; --fg:#fff;
+    --pop:#15181d; --pop-b:#2a2f37; color-scheme: dark;
+  }
+  html[data-theme="light"] {
+    --bg:#eef0f4; --line:#d5d9e0; --card:#ffffff; --btn:#f3f4f7; --btn-b:#d3d8e0; --btn-h:#e8ebf0; --btn-a:#dde1e8;
+    --dis:#a0a6b0; --muted:#6b717c; --row:#f3f5f8; --sub:#4a505b; --dash:#b8bec9; --dim:#8a909a; --fg:#1b1f26;
+    --pop:#ffffff; --pop-b:#d5d9e0; color-scheme: light;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { min-height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    border-top: 1px solid var(--line);
+    color: var(--fg);
+    font-family: "Noto Sans", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    padding: 60px 16px 40px;
+  }
+  .hidden { display: none !important; }
+  #status { margin-top: 14px; font-size: 14px; line-height: 20px; color: var(--muted); min-height: 20px; }
+  #status.err { color: #e0247f; }
+  #start .card { width: 270px; }
+
+  /* ---------- start screen ---------- */
+  #start { display: flex; justify-content: center; }
+  .card { background: var(--card); border-radius: 8px; padding: 21px; text-align: center; }
+  h1 { margin: 0 0 18px; font-size: 24px; font-weight: 700; line-height: 36px; letter-spacing: -.2px; }
+
+  button {
+    width: 100%; height: 48px;
+    background: var(--btn); border: 1px solid var(--btn-b); border-radius: 4px;
+    color: var(--fg); font: inherit; font-size: 17px; font-weight: 600;
+    cursor: pointer; transition: background .15s;
+  }
+  button:hover:not(:disabled) { background: var(--btn-h); }
+  button:active:not(:disabled) { background: var(--btn-a); }
+  button:disabled { cursor: not-allowed; color: var(--dis); }
+
+  /* ---------- result screen ---------- */
+  #best {
+    text-align: center; color: var(--muted); font-weight: 700; font-size: 18px;
+    margin: -18px 0 22px; line-height: 28px;
+  }
+  .layout { display: flex; justify-content: center; align-items: flex-start; gap: 40px; flex-wrap: wrap; }
+  .left { width: 250px; padding: 24px 21px 21px; }
+  .left h2 { margin: 0 0 24px; font-size: 24px; line-height: 30px; font-weight: 700; }
+  .img {
+    width: 180px; height: 180px; margin: 0 auto 36px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg); border: 2px dashed var(--dash); border-radius: 50%;
+    animation: spin 12s linear infinite;
+    color: var(--dim); font-size: 15px; overflow: hidden;
+  }
+  .img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .left button { margin-bottom: 22px; }
+  .left button:last-child { margin-bottom: 0; }
+
+  .right { width: 630px; max-width: 100%; padding: 20px; }
+  .head { display: flex; justify-content: center; align-items: center; gap: 20px; margin: 4px 0 20px; }
+  @property --a { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+  .score {
+    position: relative; font-size: 30px; font-weight: 300; color: #e0247f;
+    text-shadow: 0 0 14px rgba(224,36,127,.45);
+    padding: 4px 20px; border-radius: 16px; line-height: 38px;
+  }
+  /* comet trail orbiting the score */
+  .score::before, .score::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 2px;
+    background: conic-gradient(from var(--a), transparent 0deg, transparent 200deg,
+      rgba(224,36,127,.25) 270deg, #ff4fa3 350deg, #fff 360deg);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    animation: orbit 2.4s linear infinite; pointer-events: none;
+  }
+  .score::after { filter: blur(6px); }
+  @keyframes orbit { to { --a: 360deg; } }
+  .rank {
+    font-size: 15px; color: #e0247f; border: 1px solid #e0247f;
+    border-radius: 10px; padding: 2px 14px; line-height: 26px;
+  }
+  .ach {
+    background: var(--row); border-radius: 8px; padding: 22px 20px;
+    display: flex; justify-content: space-between; align-items: center; gap: 20px;
+    margin-bottom: 20px; text-align: left;
+  }
+  .ach:last-child { margin-bottom: 0; }
+  .ach .name { font-size: 22px; font-weight: 600; line-height: 30px; }
+  .ach .desc { font-size: 18px; color: var(--sub); line-height: 30px; }
+  .ach .pts { font-size: 18px; font-weight: 500; color: var(--sub); white-space: nowrap; }
+
+  /* ---------- settings ---------- */
+  #gear { position: fixed; top: 14px; right: 14px; z-index: 20; width: 42px; height: 42px; padding: 0; font-size: 20px; line-height: 1; border-radius: 50%; }
+  #settings {
+    position: fixed; top: 64px; right: 14px; z-index: 20; width: 320px; max-width: calc(100vw - 28px);
+    max-height: calc(100vh - 80px); overflow: auto;
+    background: var(--pop); border: 1px solid var(--pop-b); border-radius: 10px; padding: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.35); text-align: left;
+  }
+  #settings h3 { margin: 0 0 8px; font-size: 13px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); }
+  #settings section + section { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--pop-b); }
+  .seg { display: flex; gap: 8px; }
+  .seg button, .mini { height: 36px; font-size: 14px; }
+  .seg button.on { border-color: #e0247f; color: #e0247f; }
+  .player { display: flex; flex-direction: column; gap: 10px; }
+  #trackName { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ctrls { display: flex; gap: 8px; }
+  .ctrls .mini { width: auto; flex: 1; }
+  .bar { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .bar input[type=range] { flex: 1; }
+  #time { min-width: 86px; text-align: right; white-space: nowrap; }
+  input[type=range] { accent-color: #e0247f; height: 18px; margin: 0; cursor: pointer; }
+  #vol { width: 100%; }
+  .vrow { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--muted); }
+  #tracks { margin: 4px 0 0; padding: 0; list-style: none; max-height: 150px; overflow: auto; }
+  #tracks li { padding: 7px 10px; border-radius: 6px; font-size: 14px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #tracks li:hover { background: var(--btn-h); }
+  #tracks li.on { color: #e0247f; font-weight: 600; }
+  .note { font-size: 13px; color: var(--muted); line-height: 18px; }
+</style>
+</head>
+<body>
+
+  <!-- settings -->
+  <button id="gear" title="Settings" aria-label="Settings">&#9881;</button>
+  <div id="settings" class="hidden">
+    <section>
+      <h3>Theme</h3>
+      <div class="seg">
+        <button id="thDark" data-theme-btn="dark">Dark</button>
+        <button id="thLight" data-theme-btn="light">Light</button>
+      </div>
+    </section>
+    <section>
+      <h3>Background music</h3>
+      <div id="noMusic" class="note hidden">No songs found. Put audio files (mp3, ogg, wav...) in <b>info/music/</b> and run build.py.</div>
+      <div id="player" class="player">
+        <div id="trackName">-</div>
+        <div class="bar"><input type="range" id="seek" min="0" max="1000" value="0"><span id="time">0:00 / 0:00</span></div>
+        <div class="ctrls">
+          <button class="mini" id="prev" title="Previous">&#9198;</button>
+          <button class="mini" id="play" title="Play / pause">&#9654;</button>
+          <button class="mini" id="next" title="Next">&#9197;</button>
+        </div>
+        <div class="vrow">Vol <input type="range" id="vol" min="0" max="100" value="50"></div>
+        <ul id="tracks"></ul>
+      </div>
+    </section>
+  </div>
+
+  <!-- start screen -->
+  <div id="start">
+    <div class="card">
+      <h1>Arrascordle</h1>
+      <button id="rollStart" disabled>Roll an user</button>
+      <div id="status"></div>
+    </div>
+  </div>
+
+  <!-- result screen -->
+  <div id="result" class="hidden">
+    <div id="best"></div>
+    <div class="layout">
+      <div class="card left">
+        <h2 id="name"></h2>
+        <div class="img" id="img"></div>
+        <button id="rollAgain">Roll Again</button>
+        <button id="export">Export</button>
+      </div>
+      <div class="card right">
+        <div class="head">
+          <div class="score" id="score"></div>
+          <div class="rank" id="rank"></div>
+        </div>
+        <div id="achs"></div>
+      </div>
+    </div>
+  </div>
+
+<script src="info/index.js"></script>
+<script>
+  /*
+    Data layout:
+      info/
+        achievements.csv       <- master list: Achievements,Desc,Points
+        users.csv              <- id,name,achievements  (achievements separated by ;)
+        pfp/                   <- 1.png, 2.png, ... (file name = the user's id in users.csv)
+    After editing anything in info/, run build.py -> regenerates info/index.js
+  */
+  const COOLDOWN = 3;  // seconds
+  const MSG_POINTS = 1; // points per message sent
+  const $ = id => document.getElementById(id);
+  const rollAgain = $("rollAgain"), exportBtn = $("export"), statusEl = $("status");
+  let USERS = [], current = null, last = null, timer = null;
+  let best = { name: "", points: -Infinity };
+  try { const b = JSON.parse(localStorage.getItem("arrascordle-best")); if (b && b.name) best = b; } catch {}
+  // cooldown survives refresh: time (ms) when the next roll is allowed
+  let nextAt = 0;
+  try { nextAt = parseInt(localStorage.getItem("arrascordle-next")) || 0; } catch {}
+  nextAt = Math.min(nextAt, Date.now() + COOLDOWN * 1000); // ignore clock tampering
+
+  // ---------- CSV ----------
+  function parseLine(line, d) {
+    const out = []; let cur = "", q = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (q) { if (c === '"') { if (line[i+1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+      else if (c === '"') q = true;
+      else if (c === d) { out.push(cur.trim()); cur = ""; }
+      else cur += c;
+    }
+    out.push(cur.trim());
+    return out;
+  }
+  function parseAchievements(text) {
+    const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter(l => l.trim());
+    const rows = lines.map(l => {
+      let r = [l.includes("\t") ? "\t" : l.includes(",") ? "," : l.includes(";") ? ";" : null]
+        .map(d => d ? parseLine(l, d) : l.trim().split(/\s{2,}/))[0];
+      return r;
+    }).filter(r => r.length >= 2);
+    const num = v => parseInt(String(v).replace(/[^\d-]/g, ""), 10);
+    const out = [];
+    rows.forEach((r, i) => {
+      const pts = num(r[r.length - 1]);
+      if (isNaN(pts)) { if (i === 0) return; /* header */ else return; }
+      const name = r[0], desc = r.length > 2 ? r.slice(1, -1).join(", ") : "";
+      out.push({ name, desc, pts });
+    });
+    return out;
+  }
+
+  // ---------- load (from info/index.js, made by build.py) ----------
+  function parseList(text) {
+    const names = text.replace(/^\uFEFF/, "").split(/\r?\n/)
+      .map(l => l.trim().replace(/^"(.*)"$/, "$1").trim()).filter(Boolean);
+    if (names.length && /^achievements?$/i.test(names[0])) names.shift(); // header
+    return names;
+  }
+  function init() {
+    const data = window.INFO;
+    if (!data || !Array.isArray(data.users) || !data.users.length) {
+      statusEl.className = "err";
+      statusEl.textContent = "No users found. Run build.py to generate info/index.js";
+      return;
+    }
+    // master list: Achievements, Desc, Points
+    const master = new Map(parseAchievements(data.master || "").map(a => [a.name.trim().toLowerCase(), a]));
+    USERS = data.users.map(d => {
+      const achievements = parseList(d.list || "").map(n => master.get(n.toLowerCase()) || { name: n, desc: "", pts: 0 })
+        .sort((a, b) => b.pts - a.pts); // largest -> smallest
+      const messages = parseInt(d.messages) || 0;
+      if (messages > 0) achievements.unshift({ name: "Messages", desc: `Sent ${messages.toLocaleString()} messages in the server.`, pts: messages * MSG_POINTS });
+      return { name: d.name, achievements, image: d.image ? encodeURI(d.image) : null,
+               points: achievements.reduce((t, a) => t + a.pts, 0) };
+    });
+    USERS.forEach(u => u.rank = 1 + USERS.filter(o => o.points > u.points).length);
+    $("rollStart").disabled = false;
+  }
+  init();
+  if (nextAt > Date.now()) startCooldown();
+
+  // ---------- render ----------
+  function render(u) {
+    $("name").textContent = u.name;
+    $("score").textContent = u.points;
+    $("rank").textContent = "#" + u.rank;
+    const img = $("img"); img.innerHTML = "";
+    if (u.image) { const i = document.createElement("img"); i.src = u.image; i.alt = u.name; img.appendChild(i); }
+    else img.textContent = "image";
+    const box = $("achs"); box.innerHTML = "";
+    u.achievements.forEach(a => {
+      const row = document.createElement("div"); row.className = "ach";
+      const l = document.createElement("div");
+      const n = document.createElement("div"); n.className = "name"; n.textContent = a.name;
+      const d = document.createElement("div"); d.className = "desc"; d.textContent = a.desc;
+      l.append(n, d);
+      const p = document.createElement("div"); p.className = "pts"; p.textContent = (a.pts >= 0 ? "+" : "") + a.pts;
+      row.append(l, p); box.appendChild(row);
+    });
+    $("best").textContent = `Best roll: ${best.name}(${best.points})`;
+  }
+
+  function startCooldown() {
+    clearInterval(timer);
+    const tick = () => {
+      const left = Math.ceil((nextAt - Date.now()) / 1000);
+      if (left <= 0) {
+        clearInterval(timer);
+        rollAgain.disabled = false; rollAgain.textContent = "Roll Again";
+        $("rollStart").disabled = !USERS.length; $("rollStart").textContent = "Roll an user";
+      } else {
+        rollAgain.disabled = true; rollAgain.textContent = `Roll Again (${left})`;
+        $("rollStart").disabled = true; $("rollStart").textContent = `Roll an user (${left})`;
+      }
+    };
+    tick();
+    if (nextAt > Date.now()) timer = setInterval(tick, 250);
+  }
+
+  function roll() {
+    if (!USERS.length || Date.now() < nextAt) return;
+    let pool = USERS.length > 1 ? USERS.filter(u => u !== last) : USERS;
+    current = last = pool[Math.floor(Math.random() * pool.length)];
+    if (current.points > best.points) {
+      best = { name: current.name, points: current.points };
+      try { localStorage.setItem("arrascordle-best", JSON.stringify(best)); } catch {}
+    }
+    nextAt = Date.now() + COOLDOWN * 1000;
+    try { localStorage.setItem("arrascordle-next", String(nextAt)); } catch {}
+    render(current);
+    $("start").classList.add("hidden");
+    $("result").classList.remove("hidden");
+    startCooldown();
+  }
+
+  $("rollStart").onclick = roll;
+  rollAgain.onclick = () => { if (!rollAgain.disabled) roll(); };
+
+  exportBtn.onclick = async () => {
+    if (!current) return;
+    const extra = current.achievements.length - 3;
+    const text =
+      `**${current.name}**\n${current.points} score #${current.rank}\n\n` +
+      current.achievements.slice(0, 3).map(a => `${a.name} ${a.pts >= 0 ? "+" : ""}${a.pts}`).join("\n") +
+      (extra > 0 ? `\n+${extra} more badge${extra > 1 ? "s" : ""}` : "") +
+      "\n\nArrascordle\nhttps://shortcut1power.github.io/arrascordle/";
+    try { await navigator.clipboard.writeText(text); }
+    catch {
+      const t = document.createElement("textarea");
+      t.value = text; document.body.appendChild(t); t.select();
+      document.execCommand("copy"); t.remove();
+    }
+    exportBtn.textContent = "Copied!";
+    setTimeout(() => exportBtn.textContent = "Export", 1200);
+  };
+
+  // ---------- settings: theme + music ----------
+  (function () {
+    const root = document.documentElement;
+    const store = {
+      get(k, d) { try { const v = localStorage.getItem("arrascordle-" + k); return v === null ? d : v; } catch { return d; } },
+      set(k, v) { try { localStorage.setItem("arrascordle-" + k, v); } catch {} }
+    };
+    // theme
+    function setTheme(t) {
+      root.dataset.theme = t; store.set("theme", t);
+      document.querySelectorAll("[data-theme-btn]").forEach(b => b.classList.toggle("on", b.dataset.themeBtn === t));
+    }
+    document.querySelectorAll("[data-theme-btn]").forEach(b => b.onclick = () => setTheme(b.dataset.themeBtn));
+    setTheme(root.dataset.theme === "light" ? "light" : "dark");
+
+    // panel open/close
+    const panel = $("settings"), gear = $("gear");
+    gear.onclick = e => { e.stopPropagation(); panel.classList.toggle("hidden"); };
+    document.addEventListener("click", e => { if (!panel.contains(e.target) && e.target !== gear) panel.classList.add("hidden"); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") panel.classList.add("hidden"); });
+
+    // music (info/music/ -> window.INFO.music, made by build.py)
+    const songs = (window.INFO && Array.isArray(window.INFO.music)) ? window.INFO.music : [];
+    if (!songs.length) { $("player").classList.add("hidden"); $("noMusic").classList.remove("hidden"); return; }
+    const audio = new Audio(); audio.preload = "metadata";
+    const fmt = s => { s = Math.max(0, Math.floor(s || 0)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
+    let idx = Math.min(parseInt(store.get("track", 0)) || 0, songs.length - 1);
+    let wantPlay = store.get("playing", "0") === "1";
+    let seeking = false;
+
+    const list = $("tracks");
+    songs.forEach((s, i) => {
+      const li = document.createElement("li"); li.textContent = s.name; li.title = s.name;
+      li.onclick = () => { load(i); play(); };
+      list.appendChild(li);
+    });
+    function paintTime() {
+      const d = isFinite(audio.duration) ? audio.duration : 0;
+      $("time").textContent = fmt(audio.currentTime) + " / " + fmt(d);
+      if (!seeking) $("seek").value = d ? Math.round(audio.currentTime / d * 1000) : 0;
+    }
+    function paintPlay() { $("play").innerHTML = audio.paused ? "&#9654;" : "&#9208;"; }
+    function load(i) {
+      idx = (i + songs.length) % songs.length;
+      audio.src = encodeURI(songs[idx].file);
+      $("trackName").textContent = songs[idx].name;
+      [...list.children].forEach((li, j) => li.classList.toggle("on", j === idx));
+      store.set("track", idx); paintTime();
+    }
+    function play() {
+      wantPlay = true; store.set("playing", "1");
+      return audio.play().catch(() => {}); // blocked until the first click -> handled below
+    }
+    function pause() { wantPlay = false; store.set("playing", "0"); audio.pause(); }
+
+    $("play").onclick = () => audio.paused ? play() : pause();
+    $("next").onclick = () => { load(idx + 1); if (wantPlay) play(); };
+    $("prev").onclick = () => { if (audio.currentTime > 3) audio.currentTime = 0; else { load(idx - 1); if (wantPlay) play(); } };
+    audio.onended = () => { load(idx + 1); play(); };
+    audio.onplay = audio.onpause = paintPlay;
+    audio.ontimeupdate = audio.onloadedmetadata = audio.ondurationchange = paintTime;
+    const seek = $("seek");
+    seek.oninput = () => { seeking = true; const d = audio.duration || 0; $("time").textContent = fmt(seek.value / 1000 * d) + " / " + fmt(d); };
+    seek.onchange = () => { if (isFinite(audio.duration)) audio.currentTime = seek.value / 1000 * audio.duration; seeking = false; };
+    const vol = $("vol"); vol.value = store.get("vol", 50); audio.volume = vol.value / 100;
+    vol.oninput = () => { audio.volume = vol.value / 100; store.set("vol", vol.value); };
+
+    load(idx); paintPlay();
+    if (wantPlay) { // browsers block autoplay: resume on the first click anywhere
+      audio.play().catch(() => {
+        const go = () => { if (wantPlay) audio.play().catch(() => {}); };
+        document.addEventListener("pointerdown", go, { once: true });
+      });
+    }
+  })();
+</script>
+</body>
+</html>
