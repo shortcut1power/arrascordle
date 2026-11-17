@@ -108,25 +108,9 @@
     box-shadow: 0 10px 40px rgba(0,0,0,.35); text-align: left;
   }
   #settings h3 { margin: 0 0 8px; font-size: 13px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); }
-  #settings section + section { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--pop-b); }
   .seg { display: flex; gap: 8px; }
-  .seg button, .mini { height: 36px; font-size: 14px; }
+  .seg button { height: 36px; font-size: 14px; }
   .seg button.on { border-color: #e0247f; color: #e0247f; }
-  .player { display: flex; flex-direction: column; gap: 10px; }
-  #trackName { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .ctrls { display: flex; gap: 8px; }
-  .ctrls .mini { width: auto; flex: 1; }
-  .bar { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .bar input[type=range] { flex: 1; }
-  #time { min-width: 86px; text-align: right; white-space: nowrap; }
-  input[type=range] { accent-color: #e0247f; height: 18px; margin: 0; cursor: pointer; }
-  #vol { width: 100%; }
-  .vrow { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--muted); }
-  #tracks { margin: 4px 0 0; padding: 0; list-style: none; max-height: 150px; overflow: auto; }
-  #tracks li { padding: 7px 10px; border-radius: 6px; font-size: 14px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  #tracks li:hover { background: var(--btn-h); }
-  #tracks li.on { color: #e0247f; font-weight: 600; }
-  .note { font-size: 13px; color: var(--muted); line-height: 18px; }
 </style>
 </head>
 <body>
@@ -139,21 +123,6 @@
       <div class="seg">
         <button id="thDark" data-theme-btn="dark">Dark</button>
         <button id="thLight" data-theme-btn="light">Light</button>
-      </div>
-    </section>
-    <section>
-      <h3>Background music</h3>
-      <div id="noMusic" class="note hidden">No songs found. Put audio files (mp3, ogg, wav...) in <b>info/music/</b> and run build.py.</div>
-      <div id="player" class="player">
-        <div id="trackName">-</div>
-        <div class="bar"><input type="range" id="seek" min="0" max="1000" value="0"><span id="time">0:00 / 0:00</span></div>
-        <div class="ctrls">
-          <button class="mini" id="prev" title="Previous">&#9198;</button>
-          <button class="mini" id="play" title="Play / pause">&#9654;</button>
-          <button class="mini" id="next" title="Next">&#9197;</button>
-        </div>
-        <div class="vrow">Vol <input type="range" id="vol" min="0" max="100" value="50"></div>
-        <ul id="tracks"></ul>
       </div>
     </section>
   </div>
@@ -345,16 +314,12 @@
     setTimeout(() => exportBtn.textContent = "Export", 1200);
   };
 
-  // ---------- settings: theme + music ----------
+  // ---------- settings: theme ----------
   (function () {
     const root = document.documentElement;
-    const store = {
-      get(k, d) { try { const v = localStorage.getItem("arrascordle-" + k); return v === null ? d : v; } catch { return d; } },
-      set(k, v) { try { localStorage.setItem("arrascordle-" + k, v); } catch {} }
-    };
-    // theme
     function setTheme(t) {
-      root.dataset.theme = t; store.set("theme", t);
+      root.dataset.theme = t;
+      try { localStorage.setItem("arrascordle-theme", t); } catch {}
       document.querySelectorAll("[data-theme-btn]").forEach(b => b.classList.toggle("on", b.dataset.themeBtn === t));
     }
     document.querySelectorAll("[data-theme-btn]").forEach(b => b.onclick = () => setTheme(b.dataset.themeBtn));
@@ -365,8 +330,6 @@
     gear.onclick = e => { e.stopPropagation(); panel.classList.toggle("hidden"); };
     document.addEventListener("click", e => { if (!panel.contains(e.target) && e.target !== gear) panel.classList.add("hidden"); });
     document.addEventListener("keydown", e => { if (e.key === "Escape") panel.classList.add("hidden"); });
-      });
-    }
   })();
 </script>
 </body>
