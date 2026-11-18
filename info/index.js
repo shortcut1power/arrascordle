@@ -29,7 +29,7 @@ window.INFO = {
   {
    "name": "Fef",
    "image": "info/pfp/6.png",
-   "list": "Certified Arras.io Tank\nArtist\nTriangle\nSquare\nEgg"
+   "list": "Certified Arras.io Tank\nArtist\nPentagon\nTriangle\nSquare\nEgg"
   },
   {
    "name": "JSON",
