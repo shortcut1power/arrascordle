@@ -4,18 +4,32 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Arrascordle</title>
-<script>try{if(localStorage.getItem('arrascordle-theme')==='light')document.documentElement.dataset.theme='light'}catch(e){}</script>
+<script>
+try {
+  var d = document.documentElement;
+  var g = function (k) { try { return localStorage.getItem("arrascordle-" + k); } catch (e) { return null; } };
+  var t = g("theme");
+  if (t === "light" || (t === "auto" && matchMedia("(prefers-color-scheme: light)").matches)) d.dataset.theme = "light";
+  var a = g("accent");
+  if (/^#[0-9a-f]{6}$/i.test(a)) d.style.setProperty("--accent", a);
+  var s = g("size");
+  if (s === "small" || s === "large") d.dataset.size = s;
+} catch (e) {}
+</script>
 <style>
   :root {
     --bg:#1f232a; --line:#343840; --card:#15181d; --btn:#171a1f; --btn-b:#1c2026; --btn-h:#1d2127; --btn-a:#12151a;
     --dis:#7d828b; --muted:#8d9096; --row:#181b20; --sub:#c3c8d3; --dash:#3a3f48; --dim:#6f747d; --fg:#fff;
     --pop:#15181d; --pop-b:#2a2f37; color-scheme: dark;
+    --accent:#e0247f; --err:#e0247f; --s:1;
   }
   html[data-theme="light"] {
     --bg:#eef0f4; --line:#d5d9e0; --card:#ffffff; --btn:#f3f4f7; --btn-b:#d3d8e0; --btn-h:#e8ebf0; --btn-a:#dde1e8;
     --dis:#a0a6b0; --muted:#6b717c; --row:#f3f5f8; --sub:#4a505b; --dash:#b8bec9; --dim:#8a909a; --fg:#1b1f26;
     --pop:#ffffff; --pop-b:#d5d9e0; color-scheme: light;
   }
+  html[data-size="small"] { --s:.8; }
+  html[data-size="large"] { --s:1.15; }
 
   * { box-sizing: border-box; }
   html, body { min-height: 100%; margin: 0; }
@@ -28,7 +42,7 @@
   }
   .hidden { display: none !important; }
   #status { margin-top: 14px; font-size: 14px; line-height: 20px; color: var(--muted); min-height: 20px; }
-  #status.err { color: #e0247f; }
+  #status.err { color: var(--err); }
   #start .card { width: 270px; }
 
   /* ---------- start screen ---------- */
@@ -49,9 +63,11 @@
   /* ---------- result screen ---------- */
   #best {
     text-align: center; color: var(--muted); font-weight: 700; font-size: 18px;
-    margin: -18px 0 22px; line-height: 28px;
+    margin: -18px 0 22px; line-height: 28px; min-height: 28px;
   }
   .layout { display: flex; justify-content: center; align-items: flex-start; gap: 40px; flex-wrap: wrap; }
+  .layout.fade { animation: fadein .45s ease both; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
   .left { width: 250px; padding: 24px 21px 21px; }
   .left h2 { margin: 0 0 24px; font-size: 24px; line-height: 30px; font-weight: 700; }
   .img {
@@ -70,15 +86,16 @@
   .head { display: flex; justify-content: center; align-items: center; gap: 20px; margin: 4px 0 20px; }
   @property --a { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
   .score {
-    position: relative; font-size: 30px; font-weight: 300; color: #e0247f;
-    text-shadow: 0 0 14px rgba(224,36,127,.45);
+    position: relative; font-size: 30px; font-weight: 300; color: var(--accent);
+    text-shadow: 0 0 14px color-mix(in srgb, var(--accent) 45%, transparent);
     padding: 4px 20px; border-radius: 16px; line-height: 38px;
   }
   /* comet trail orbiting the score */
   .score::before, .score::after {
     content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 2px;
     background: conic-gradient(from var(--a), transparent 0deg, transparent 200deg,
-      rgba(224,36,127,.25) 270deg, #ff4fa3 350deg, #fff 360deg);
+      color-mix(in srgb, var(--accent) 25%, transparent) 270deg,
+      color-mix(in srgb, var(--accent) 70%, white) 350deg, #fff 360deg);
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor; mask-composite: exclude;
     animation: orbit 2.4s linear infinite; pointer-events: none;
@@ -86,18 +103,21 @@
   .score::after { filter: blur(6px); }
   @keyframes orbit { to { --a: 360deg; } }
   .rank {
-    font-size: 15px; color: #e0247f; border: 1px solid #e0247f;
+    font-size: 15px; color: var(--accent); border: 1px solid var(--accent);
     border-radius: 10px; padding: 2px 14px; line-height: 26px;
   }
   .ach {
-    background: var(--row); border-radius: 8px; padding: 22px 20px;
+    background: var(--row); border-radius: 8px;
+    padding: calc(22px * var(--s)) calc(20px * var(--s));
     display: flex; justify-content: space-between; align-items: center; gap: 20px;
-    margin-bottom: 20px; text-align: left;
+    margin-bottom: calc(20px * var(--s)); text-align: left;
   }
   .ach:last-child { margin-bottom: 0; }
-  .ach .name { font-size: 22px; font-weight: 600; line-height: 30px; }
-  .ach .desc { font-size: 18px; color: var(--sub); line-height: 30px; }
-  .ach .pts { font-size: 18px; font-weight: 500; color: var(--sub); white-space: nowrap; }
+  .ach .name { font-size: calc(22px * var(--s)); font-weight: 600; line-height: calc(30px * var(--s)); }
+  .ach .desc { font-size: calc(18px * var(--s)); color: var(--sub); line-height: calc(30px * var(--s)); }
+  .ach .pts { font-size: calc(18px * var(--s)); font-weight: 500; color: var(--sub); white-space: nowrap; }
+  .shuffling #achs { opacity: .5; }
+  .shuffling .score, .shuffling #name { filter: blur(.6px); }
 
   /* ---------- settings ---------- */
   #gear { position: fixed; top: 14px; right: 14px; z-index: 20; width: 42px; height: 42px; padding: 0; font-size: 20px; line-height: 1; border-radius: 50%; }
@@ -107,26 +127,25 @@
     background: var(--pop); border: 1px solid var(--pop-b); border-radius: 10px; padding: 16px;
     box-shadow: 0 10px 40px rgba(0,0,0,.35); text-align: left;
   }
+  #settings section + section { margin-top: 18px; }
   #settings h3 { margin: 0 0 8px; font-size: 13px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); }
-  #settings section + section { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--pop-b); }
   .seg { display: flex; gap: 8px; }
-  .seg button, .mini { height: 36px; font-size: 14px; }
-  .seg button.on { border-color: #e0247f; color: #e0247f; }
-  .player { display: flex; flex-direction: column; gap: 10px; }
-  #trackName { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .ctrls { display: flex; gap: 8px; }
-  .ctrls .mini { width: auto; flex: 1; }
-  .bar { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .bar input[type=range] { flex: 1; }
-  #time { min-width: 86px; text-align: right; white-space: nowrap; }
-  input[type=range] { accent-color: #e0247f; height: 18px; margin: 0; cursor: pointer; }
-  #vol { width: 100%; }
-  .vrow { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--muted); }
-  #tracks { margin: 4px 0 0; padding: 0; list-style: none; max-height: 150px; overflow: auto; }
-  #tracks li { padding: 7px 10px; border-radius: 6px; font-size: 14px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  #tracks li:hover { background: var(--btn-h); }
-  #tracks li.on { color: #e0247f; font-weight: 600; }
-  .note { font-size: 13px; color: var(--muted); line-height: 18px; }
+  .seg button { height: 36px; font-size: 14px; }
+  .seg button.on { border-color: var(--accent); color: var(--accent); }
+
+  .sw { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .sw button { width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 2px solid var(--btn-b); }
+  .sw button.on { outline: 2px solid var(--fg); outline-offset: 2px; }
+  .sw input[type=color] { width: 30px; height: 30px; padding: 0; border: none; background: none; cursor: pointer; }
+
+  .vol { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-size: 13px; color: var(--sub); }
+  .vol input { flex: 1; accent-color: var(--accent); }
+
+  .statline { font-size: 13px; color: var(--sub); margin-bottom: 8px; }
+  .hist { max-height: 110px; overflow: auto; font-size: 13px; color: var(--sub); background: var(--row); border-radius: 6px; padding: 6px 10px; margin-bottom: 10px; }
+  .hist div { display: flex; justify-content: space-between; gap: 10px; padding: 2px 0; }
+  .rst { display: flex; flex-direction: column; gap: 8px; }
+  .rst button { height: 34px; font-size: 13px; }
 </style>
 </head>
 <body>
@@ -136,24 +155,62 @@
   <div id="settings" class="hidden">
     <section>
       <h3>Theme</h3>
-      <div class="seg">
-        <button id="thDark" data-theme-btn="dark">Dark</button>
-        <button id="thLight" data-theme-btn="light">Light</button>
+      <div class="seg" data-key="theme">
+        <button data-v="dark">Dark</button>
+        <button data-v="light">Light</button>
+        <button data-v="auto">Auto</button>
       </div>
     </section>
     <section>
-      <h3>Background music</h3>
-      <div id="noMusic" class="note hidden">No songs found. Put audio files (mp3, ogg, wav...) in <b>info/music/</b> and run build.py.</div>
-      <div id="player" class="player">
-        <div id="trackName">-</div>
-        <div class="bar"><input type="range" id="seek" min="0" max="1000" value="0"><span id="time">0:00 / 0:00</span></div>
-        <div class="ctrls">
-          <button class="mini" id="prev" title="Previous">&#9198;</button>
-          <button class="mini" id="play" title="Play / pause">&#9654;</button>
-          <button class="mini" id="next" title="Next">&#9197;</button>
-        </div>
-        <div class="vrow">Vol <input type="range" id="vol" min="0" max="100" value="50"></div>
-        <ul id="tracks"></ul>
+      <h3>Accent colour</h3>
+      <div class="sw" id="sw">
+        <button data-c="#e0247f" style="background:#e0247f" title="Pink" aria-label="Pink"></button>
+        <button data-c="#2f7df6" style="background:#2f7df6" title="Blue" aria-label="Blue"></button>
+        <button data-c="#1fae6b" style="background:#1fae6b" title="Green" aria-label="Green"></button>
+        <button data-c="#e0a100" style="background:#e0a100" title="Gold" aria-label="Gold"></button>
+        <button data-c="#8b5cf6" style="background:#8b5cf6" title="Purple" aria-label="Purple"></button>
+        <input type="color" id="accentPick" title="Custom colour" aria-label="Custom colour">
+      </div>
+    </section>
+    <section>
+      <h3>Text size</h3>
+      <div class="seg" data-key="size">
+        <button data-v="small">Small</button>
+        <button data-v="normal">Normal</button>
+        <button data-v="large">Large</button>
+      </div>
+    </section>
+    <section>
+      <h3>Reveal animation</h3>
+      <div class="seg" data-key="reveal">
+        <button data-v="none">None</button>
+        <button data-v="fade">Fade</button>
+        <button data-v="shuffle">Shuffle</button>
+      </div>
+    </section>
+    <section>
+      <h3>Number format</h3>
+      <div class="seg" data-key="num">
+        <button data-v="full">Full</button>
+        <button data-v="compact">Compact (1.2k)</button>
+      </div>
+    </section>
+    <section>
+      <h3>Sound</h3>
+      <div class="seg" data-key="sound">
+        <button data-v="on">On</button>
+        <button data-v="off">Off</button>
+      </div>
+      <div class="vol"><span>Volume</span><input type="range" id="vol" min="0" max="100" step="5" aria-label="Volume"></div>
+    </section>
+    <section>
+      <h3>Data</h3>
+      <div class="statline" id="stats"></div>
+      <div class="hist" id="hist"></div>
+      <div class="rst">
+        <button id="rstBest">Reset best roll</button>
+        <button id="rstHist">Reset history</button>
+        <button id="rstStats">Reset stats</button>
       </div>
     </section>
   </div>
@@ -170,7 +227,7 @@
   <!-- result screen -->
   <div id="result" class="hidden">
     <div id="best"></div>
-    <div class="layout">
+    <div class="layout" id="layout">
       <div class="card left">
         <h2 id="name"></h2>
         <div class="img" id="img"></div>
@@ -197,13 +254,56 @@
         pfp/                   <- 1.png, 2.png, ... (file name = the user's id in users.csv)
     After editing anything in info/, run build.py -> regenerates info/index.js
   */
-  const COOLDOWN = 3;   // seconds
+  const COOLDOWN = 3;  // seconds
   const MSG_POINTS = 1; // points per message sent
+  const HISTORY_MAX = 20;
   const $ = id => document.getElementById(id);
   const rollAgain = $("rollAgain"), exportBtn = $("export"), statusEl = $("status");
   let USERS = [], current = null, last = null, timer = null;
+  let revealing = false, revTimer = null;
   let best = { name: "", points: -Infinity };
   try { const b = JSON.parse(localStorage.getItem("arrascordle-best")); if (b && b.name) best = b; } catch {}
+  // cooldown survives refresh: time (ms) when the next roll is allowed
+  let nextAt = 0;
+  try { nextAt = parseInt(localStorage.getItem("arrascordle-next")) || 0; } catch {}
+  nextAt = Math.min(nextAt, Date.now() + COOLDOWN * 1000); // ignore clock tampering
+
+  // ---------- storage + settings state ----------
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem("arrascordle-" + k); return v === null ? d : v; } catch { return d; } },
+    set(k, v) { try { localStorage.setItem("arrascordle-" + k, v); } catch {} },
+    del(k)    { try { localStorage.removeItem("arrascordle-" + k); } catch {} },
+    load(k, d) { try { const v = JSON.parse(localStorage.getItem("arrascordle-" + k)); return v == null ? d : v; } catch { return d; } },
+    save(k, v) { try { localStorage.setItem("arrascordle-" + k, JSON.stringify(v)); } catch {} },
+  };
+  const pick = (v, ok, d) => ok.includes(v) ? v : d;
+  const S = {
+    theme:  pick(store.get("theme"), ["dark", "light", "auto"], "dark"),
+    accent: store.get("accent", "#e0247f"),
+    size:   pick(store.get("size"), ["small", "normal", "large"], "normal"),
+    reveal: pick(store.get("reveal"), ["none", "fade", "shuffle"], "fade"),
+    num:    pick(store.get("num"), ["full", "compact"], "full"),
+    sound:  pick(store.get("sound"), ["on", "off"], "on"),
+    vol:    parseFloat(store.get("vol", "0.5")),
+  };
+  if (!/^#[0-9a-f]{6}$/i.test(S.accent)) S.accent = "#e0247f";
+  if (isNaN(S.vol)) S.vol = 0.5;
+  S.vol = Math.min(1, Math.max(0, S.vol));
+
+  let history = store.load("history", []);
+  if (!Array.isArray(history)) history = [];
+  let stats = store.load("stats", null);
+  if (!stats || typeof stats !== "object") stats = {};
+  stats = { rolls: +stats.rolls || 0, sum: +stats.sum || 0, seen: Array.isArray(stats.seen) ? stats.seen : [] };
+
+  // ---------- number format ----------
+  function fmt(n) {
+    if (S.num !== "compact" || Math.abs(n) < 1000) return String(n);
+    for (const [v, s] of [[1e3, "k"], [1e6, "M"], [1e9, "B"]]) {
+      const r = Math.round(n / v * 10) / 10;
+      if (Math.abs(r) < 1000 || s === "B") return r + s;
+    }
+  }
 
   // ---------- CSV ----------
   function parseLine(line, d) {
@@ -264,15 +364,45 @@
     $("rollStart").disabled = false;
   }
   init();
+  if (nextAt > Date.now()) startCooldown();
+
+  // ---------- sound (synthesized, no files needed) ----------
+  let actx = null;
+  function beep(freq, t0, dur, type, gain) {
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t0);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.linearRampToValueAtTime(gain, t0 + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(actx.destination);
+    o.start(t0); o.stop(t0 + dur + 0.02);
+  }
+  function playRoll(ticks) {
+    if (S.sound !== "on" || S.vol <= 0) return;
+    try {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === "suspended") actx.resume();
+      const t = actx.currentTime + 0.01, v = S.vol * 0.25;
+      let at = 0;
+      if (ticks) {
+        for (let i = 0; i < 9; i++) { beep(280 + i * 60, t + i * 0.075, 0.05, "square", v * 0.5); }
+        at = 0.8;
+      }
+      beep(660, t + at, 0.16, "triangle", v);
+      beep(990, t + at + 0.08, 0.32, "triangle", v);
+    } catch {}
+  }
 
   // ---------- render ----------
-  function render(u) {
+  function paint(u, withImg = true) {
     $("name").textContent = u.name;
-    $("score").textContent = u.points;
+    $("score").textContent = fmt(u.points);
     $("rank").textContent = "#" + u.rank;
-    const img = $("img"); img.innerHTML = "";
-    if (u.image) { const i = document.createElement("img"); i.src = u.image; i.alt = u.name; img.appendChild(i); }
-    else img.textContent = "image";
+    if (withImg) {
+      const img = $("img"); img.innerHTML = "";
+      if (u.image) { const i = document.createElement("img"); i.src = u.image; i.alt = u.name; img.appendChild(i); }
+      else img.textContent = "image";
+    }
     const box = $("achs"); box.innerHTML = "";
     u.achievements.forEach(a => {
       const row = document.createElement("div"); row.className = "ach";
@@ -280,49 +410,115 @@
       const n = document.createElement("div"); n.className = "name"; n.textContent = a.name;
       const d = document.createElement("div"); d.className = "desc"; d.textContent = a.desc;
       l.append(n, d);
-      const p = document.createElement("div"); p.className = "pts"; p.textContent = (a.pts >= 0 ? "+" : "") + a.pts;
+      const p = document.createElement("div"); p.className = "pts"; p.textContent = (a.pts >= 0 ? "+" : "") + fmt(a.pts);
       row.append(l, p); box.appendChild(row);
     });
-    $("best").textContent = `Best roll: ${best.name}(${best.points})`;
+  }
+  function updateBest() {
+    $("best").textContent = best.name ? `Best roll: ${best.name}(${fmt(best.points)})` : "";
+  }
+  function render(u) { paint(u); updateBest(); }
+
+  // ---------- reveal animation ----------
+  function revealMode() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return "none";
+    if (S.reveal === "shuffle" && USERS.length < 3) return "fade";
+    return S.reveal;
+  }
+  function reveal(u, mode) {
+    clearTimeout(revTimer);
+    const layout = $("layout"), result = $("result");
+    layout.classList.remove("fade");
+    if (mode === "shuffle") {
+      revealing = true; result.classList.add("shuffling");
+      const N = 10; let i = 0, prev = null;
+      const step = () => {
+        if (i < N) {
+          let r; do { r = USERS[Math.floor(Math.random() * USERS.length)]; } while (r === prev || r === u);
+          prev = r; paint(r, false);
+          i++; revTimer = setTimeout(step, 40 + i * 8);
+        } else {
+          revealing = false; result.classList.remove("shuffling");
+          render(u);
+        }
+      };
+      step();
+    } else {
+      render(u);
+      if (mode === "fade") { void layout.offsetWidth; layout.classList.add("fade"); }
+    }
   }
 
   function startCooldown() {
-    let left = COOLDOWN;
     clearInterval(timer);
-    rollAgain.disabled = true;
-    rollAgain.textContent = `Roll Again (${left})`;
-    timer = setInterval(() => {
-      left--;
-      if (left <= 0) { clearInterval(timer); rollAgain.disabled = false; rollAgain.textContent = "Roll Again"; }
-      else rollAgain.textContent = `Roll Again (${left})`;
-    }, 1000);
+    const tick = () => {
+      const left = Math.ceil((nextAt - Date.now()) / 1000);
+      if (left <= 0) {
+        clearInterval(timer);
+        rollAgain.disabled = false; rollAgain.textContent = "Roll Again";
+        $("rollStart").disabled = !USERS.length; $("rollStart").textContent = "Roll an user";
+      } else {
+        rollAgain.disabled = true; rollAgain.textContent = `Roll Again (${left})`;
+        $("rollStart").disabled = true; $("rollStart").textContent = `Roll an user (${left})`;
+      }
+    };
+    tick();
+    if (nextAt > Date.now()) timer = setInterval(tick, 250);
+  }
+
+  // ---------- history + stats ----------
+  function record(u) {
+    history.unshift({ name: u.name, points: u.points, rank: u.rank });
+    if (history.length > HISTORY_MAX) history.length = HISTORY_MAX;
+    stats.rolls++; stats.sum += u.points;
+    if (!stats.seen.includes(u.name)) stats.seen.push(u.name);
+    store.save("history", history); store.save("stats", stats);
+    renderData();
+  }
+  function renderData() {
+    $("stats").textContent = stats.rolls
+      ? `Rolls ${stats.rolls} · Avg ${fmt(Math.round(stats.sum / stats.rolls))} · Seen ${stats.seen.length}/${USERS.length || "?"}`
+      : "No rolls yet.";
+    const box = $("hist"); box.innerHTML = "";
+    if (!history.length) { box.textContent = "No history yet."; return; }
+    history.forEach(h => {
+      const row = document.createElement("div");
+      const a = document.createElement("span"); a.textContent = h.name;
+      const b = document.createElement("span"); b.textContent = `${fmt(h.points)} · #${h.rank}`;
+      row.append(a, b); box.appendChild(row);
+    });
   }
 
   function roll() {
-    if (!USERS.length) return;
+    if (!USERS.length || Date.now() < nextAt || revealing) return;
     let pool = USERS.length > 1 ? USERS.filter(u => u !== last) : USERS;
     current = last = pool[Math.floor(Math.random() * pool.length)];
     if (current.points > best.points) {
       best = { name: current.name, points: current.points };
       try { localStorage.setItem("arrascordle-best", JSON.stringify(best)); } catch {}
     }
-    render(current);
+    record(current);
+    nextAt = Date.now() + COOLDOWN * 1000;
+    try { localStorage.setItem("arrascordle-next", String(nextAt)); } catch {}
     $("start").classList.add("hidden");
     $("result").classList.remove("hidden");
     startCooldown();
+    const mode = revealMode();
+    playRoll(mode === "shuffle");
+    reveal(current, mode);
   }
 
   $("rollStart").onclick = roll;
   rollAgain.onclick = () => { if (!rollAgain.disabled) roll(); };
 
   exportBtn.onclick = async () => {
-    if (!current) return;
+    if (!current || revealing) return;
     const extra = current.achievements.length - 3;
     const text =
       `**${current.name}**\n${current.points} score #${current.rank}\n\n` +
       current.achievements.slice(0, 3).map(a => `${a.name} ${a.pts >= 0 ? "+" : ""}${a.pts}`).join("\n") +
       (extra > 0 ? `\n+${extra} more badge${extra > 1 ? "s" : ""}` : "") +
-      "\n\nArrascordle";
+      "\n\nArrascordle\nhttps://shortcut1power.github.io/arrascordle/";
     try { await navigator.clipboard.writeText(text); }
     catch {
       const t = document.createElement("textarea");
@@ -333,80 +529,80 @@
     setTimeout(() => exportBtn.textContent = "Export", 1200);
   };
 
-  // ---------- settings: theme + music ----------
+  // ---------- settings ----------
   (function () {
     const root = document.documentElement;
-    const store = {
-      get(k, d) { try { const v = localStorage.getItem("arrascordle-" + k); return v === null ? d : v; } catch { return d; } },
-      set(k, v) { try { localStorage.setItem("arrascordle-" + k, v); } catch {} }
-    };
-    // theme
-    function setTheme(t) {
-      root.dataset.theme = t; store.set("theme", t);
-      document.querySelectorAll("[data-theme-btn]").forEach(b => b.classList.toggle("on", b.dataset.themeBtn === t));
+    const mq = matchMedia("(prefers-color-scheme: light)");
+
+    function markSeg(key) {
+      document.querySelectorAll(`.seg[data-key="${key}"] button`)
+        .forEach(b => b.classList.toggle("on", b.dataset.v === S[key]));
     }
-    document.querySelectorAll("[data-theme-btn]").forEach(b => b.onclick = () => setTheme(b.dataset.themeBtn));
-    setTheme(root.dataset.theme === "light" ? "light" : "dark");
+    function applyTheme() {
+      const light = S.theme === "light" || (S.theme === "auto" && mq.matches);
+      if (light) root.dataset.theme = "light"; else delete root.dataset.theme;
+      markSeg("theme");
+    }
+    function applyAccent() {
+      root.style.setProperty("--accent", S.accent);
+      $("accentPick").value = S.accent;
+      document.querySelectorAll("#sw button").forEach(b => b.classList.toggle("on", b.dataset.c === S.accent.toLowerCase()));
+    }
+    function applySize() {
+      if (S.size === "normal") delete root.dataset.size; else root.dataset.size = S.size;
+      markSeg("size");
+    }
+    function rerender() {
+      if (current && !revealing) render(current);
+      renderData();
+    }
+
+    document.querySelectorAll(".seg").forEach(seg => {
+      const key = seg.dataset.key;
+      seg.querySelectorAll("button").forEach(b => b.onclick = () => {
+        S[key] = b.dataset.v; store.set(key, S[key]); markSeg(key);
+        if (key === "theme") applyTheme();
+        else if (key === "size") applySize();
+        else if (key === "num") rerender();
+        else if (key === "sound" && S.sound === "on") playRoll(false); // preview
+      });
+    });
+
+    document.querySelectorAll("#sw button").forEach(b => b.onclick = () => {
+      S.accent = b.dataset.c; store.set("accent", S.accent); applyAccent();
+    });
+    $("accentPick").oninput = e => { S.accent = e.target.value; store.set("accent", S.accent); applyAccent(); };
+
+    const vol = $("vol");
+    vol.value = Math.round(S.vol * 100);
+    vol.oninput = () => { S.vol = vol.value / 100; store.set("vol", S.vol); };
+    vol.onchange = () => playRoll(false); // preview chime on release
+
+    mq.addEventListener("change", () => { if (S.theme === "auto") applyTheme(); });
+
+    // resets (each asks first)
+    $("rstBest").onclick = () => {
+      if (!confirm("Reset your best roll?")) return;
+      best = { name: "", points: -Infinity }; store.del("best"); updateBest();
+    };
+    $("rstHist").onclick = () => {
+      if (!confirm("Clear your roll history?")) return;
+      history = []; store.del("history"); renderData();
+    };
+    $("rstStats").onclick = () => {
+      if (!confirm("Reset your stats?")) return;
+      stats = { rolls: 0, sum: 0, seen: [] }; store.del("stats"); renderData();
+    };
+
+    applyTheme(); applyAccent(); applySize();
+    ["reveal", "num", "sound"].forEach(markSeg);
+    renderData();
 
     // panel open/close
     const panel = $("settings"), gear = $("gear");
     gear.onclick = e => { e.stopPropagation(); panel.classList.toggle("hidden"); };
     document.addEventListener("click", e => { if (!panel.contains(e.target) && e.target !== gear) panel.classList.add("hidden"); });
     document.addEventListener("keydown", e => { if (e.key === "Escape") panel.classList.add("hidden"); });
-
-    // music (info/music/ -> window.INFO.music, made by build.py)
-    const songs = (window.INFO && Array.isArray(window.INFO.music)) ? window.INFO.music : [];
-    if (!songs.length) { $("player").classList.add("hidden"); $("noMusic").classList.remove("hidden"); return; }
-    const audio = new Audio(); audio.preload = "metadata";
-    const fmt = s => { s = Math.max(0, Math.floor(s || 0)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
-    let idx = Math.min(parseInt(store.get("track", 0)) || 0, songs.length - 1);
-    let wantPlay = store.get("playing", "0") === "1";
-    let seeking = false;
-
-    const list = $("tracks");
-    songs.forEach((s, i) => {
-      const li = document.createElement("li"); li.textContent = s.name; li.title = s.name;
-      li.onclick = () => { load(i); play(); };
-      list.appendChild(li);
-    });
-    function paintTime() {
-      const d = isFinite(audio.duration) ? audio.duration : 0;
-      $("time").textContent = fmt(audio.currentTime) + " / " + fmt(d);
-      if (!seeking) $("seek").value = d ? Math.round(audio.currentTime / d * 1000) : 0;
-    }
-    function paintPlay() { $("play").innerHTML = audio.paused ? "&#9654;" : "&#9208;"; }
-    function load(i) {
-      idx = (i + songs.length) % songs.length;
-      audio.src = encodeURI(songs[idx].file);
-      $("trackName").textContent = songs[idx].name;
-      [...list.children].forEach((li, j) => li.classList.toggle("on", j === idx));
-      store.set("track", idx); paintTime();
-    }
-    function play() {
-      wantPlay = true; store.set("playing", "1");
-      return audio.play().catch(() => {}); // blocked until the first click -> handled below
-    }
-    function pause() { wantPlay = false; store.set("playing", "0"); audio.pause(); }
-
-    $("play").onclick = () => audio.paused ? play() : pause();
-    $("next").onclick = () => { load(idx + 1); if (wantPlay) play(); };
-    $("prev").onclick = () => { if (audio.currentTime > 3) audio.currentTime = 0; else { load(idx - 1); if (wantPlay) play(); } };
-    audio.onended = () => { load(idx + 1); play(); };
-    audio.onplay = audio.onpause = paintPlay;
-    audio.ontimeupdate = audio.onloadedmetadata = audio.ondurationchange = paintTime;
-    const seek = $("seek");
-    seek.oninput = () => { seeking = true; const d = audio.duration || 0; $("time").textContent = fmt(seek.value / 1000 * d) + " / " + fmt(d); };
-    seek.onchange = () => { if (isFinite(audio.duration)) audio.currentTime = seek.value / 1000 * audio.duration; seeking = false; };
-    const vol = $("vol"); vol.value = store.get("vol", 50); audio.volume = vol.value / 100;
-    vol.oninput = () => { audio.volume = vol.value / 100; store.set("vol", vol.value); };
-
-    load(idx); paintPlay();
-    if (wantPlay) { // browsers block autoplay: resume on the first click anywhere
-      audio.play().catch(() => {
-        const go = () => { if (wantPlay) audio.play().catch(() => {}); };
-        document.addEventListener("pointerdown", go, { once: true });
-      });
-    }
   })();
 </script>
 </body>
