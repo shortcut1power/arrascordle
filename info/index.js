@@ -120,6 +120,11 @@ window.INFO = {
    "name": "Byte",
    "image": "info/pfp/24.png",
    "list": "Beta Pentagon\nPentagon\nTriangle\nSquare\nEgg"
+  },
+  {
+   "name": "Appeaser",
+   "image": "info/pfp/25.png",
+   "list": "Pentagon\nTriangle\nSquare\nEgg"
   }
  ],
  "music": [
