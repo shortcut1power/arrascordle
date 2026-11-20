@@ -38,13 +38,12 @@ try {
     border-top: 1px solid var(--line);
     color: var(--fg);
     font-family: "Noto Sans", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
-    padding: 60px 16px 70px;
+    padding: 60px 16px 40px;
   }
   .hidden { display: none !important; }
   #status { margin-top: 14px; font-size: 14px; line-height: 20px; color: var(--muted); min-height: 20px; }
   #status.err { color: var(--err); }
   #start .card { width: 270px; }
-  .hint { font-size: 12px; color: var(--dim); margin-top: 14px; line-height: 18px; }
 
   /* ---------- start screen ---------- */
   #start { display: flex; justify-content: center; }
@@ -81,7 +80,7 @@ try {
   .img img { width: 100%; height: 100%; object-fit: cover; display: block; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .left button { margin-bottom: 22px; }
-  .left .hint { margin-top: -6px; }
+  .left button:last-child { margin-bottom: 0; }
 
   .right { width: 630px; max-width: 100%; padding: 20px; }
   .head { display: flex; justify-content: center; align-items: center; gap: 20px; margin: 4px 0 20px; }
@@ -122,7 +121,6 @@ try {
 
   /* ---------- settings ---------- */
   #gear { position: fixed; top: 14px; right: 14px; z-index: 20; width: 42px; height: 42px; padding: 0; font-size: 20px; line-height: 1; border-radius: 50%; }
-  #colBtn { position: fixed; top: 14px; left: 14px; z-index: 20; width: auto; height: 42px; padding: 0 16px; font-size: 15px; line-height: 1; border-radius: 21px; }
   #settings {
     position: fixed; top: 64px; right: 14px; z-index: 20; width: 320px; max-width: calc(100vw - 28px);
     max-height: calc(100vh - 80px); overflow: auto;
@@ -148,58 +146,11 @@ try {
   .hist div { display: flex; justify-content: space-between; gap: 10px; padding: 2px 0; }
   .rst { display: flex; flex-direction: column; gap: 8px; }
   .rst button { height: 34px; font-size: 13px; }
-
-  /* ---------- luck pill ---------- */
-  #luck {
-    position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); z-index: 10;
-    font-size: 13px; color: var(--muted); background: var(--card); border: 1px solid var(--line);
-    border-radius: 14px; padding: 4px 14px; white-space: nowrap; cursor: help;
-  }
-  #luck.hot { color: var(--accent); border-color: var(--accent); }
-
-  /* ---------- toast ---------- */
-  #toast {
-    position: fixed; top: 14px; left: 50%; z-index: 40; transform: translate(-50%, -150%);
-    background: var(--pop); border: 1px solid var(--accent); border-radius: 10px; padding: 10px 20px;
-    box-shadow: 0 10px 40px rgba(0,0,0,.4); text-align: center; max-width: calc(100vw - 28px);
-    transition: transform .35s ease; pointer-events: none;
-  }
-  #toast.show { transform: translate(-50%, 0); }
-  #toast b { display: block; font-size: 12px; letter-spacing: .6px; text-transform: uppercase; color: var(--accent); }
-  #toast span { font-size: 15px; font-weight: 600; }
-  #toast small { display: block; font-size: 13px; color: var(--sub); }
-
-  /* ---------- collection ---------- */
-  #coll { position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; padding: 16px; }
-  .cpanel { background: var(--pop); border: 1px solid var(--pop-b); border-radius: 12px; width: 820px; max-width: 100%; max-height: 90vh; overflow: auto; padding: 20px; text-align: left; }
-  .chead { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-  .cpanel h2 { margin: 0; font-size: 22px; line-height: 32px; }
-  .cpanel h2 span { color: var(--accent); font-weight: 400; margin-left: 6px; }
-  .cpanel h2.sub { margin: 24px 0 12px; }
-  #cclose { width: 36px; height: 36px; padding: 0; font-size: 22px; line-height: 1; border-radius: 50%; }
-  #cgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 12px; }
-  .tile { position: relative; background: var(--row); border: 2px solid transparent; border-radius: 10px; padding: 12px 6px 10px; text-align: center; }
-  .tile.cur { border-color: var(--accent); }
-  .tile.top { box-shadow: 0 0 14px color-mix(in srgb, #e0a100 55%, transparent); }
-  .tile .timg { width: 64px; height: 64px; margin: 0 auto 8px; border-radius: 50%; overflow: hidden; background: var(--bg); display: flex; align-items: center; justify-content: center; color: var(--dim); font-size: 22px; }
-  .tile .timg img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .tile.locked .timg img { filter: brightness(0) opacity(.3); }
-  .tile .tn { font-size: 13px; font-weight: 600; line-height: 18px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .tile .ts { font-size: 12px; color: var(--sub); line-height: 18px; }
-  .tile.locked .tn, .tile.locked .ts { color: var(--dim); }
-  .tile .tc { position: absolute; top: 6px; right: 8px; font-size: 11px; color: var(--accent); font-weight: 700; }
-  #blist { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
-  .bdg { background: var(--row); border-radius: 8px; padding: 10px 14px; display: flex; gap: 12px; align-items: center; }
-  .bdg .bi { font-size: 22px; }
-  .bdg .bn { font-size: 14px; font-weight: 600; line-height: 20px; }
-  .bdg .bd { font-size: 12px; color: var(--sub); line-height: 17px; }
-  .bdg.locked { opacity: .55; }
 </style>
 </head>
 <body>
 
-  <!-- collection button + settings -->
-  <button id="colBtn" title="Collection (C)" aria-label="Collection">&#9638; <span id="colN">0/0</span></button>
+  <!-- settings -->
   <button id="gear" title="Settings" aria-label="Settings">&#9881;</button>
   <div id="settings" class="hidden">
     <section>
@@ -260,34 +211,15 @@ try {
         <button id="rstBest">Reset best roll</button>
         <button id="rstHist">Reset history</button>
         <button id="rstStats">Reset stats</button>
-        <button id="rstColl">Reset collection</button>
-        <button id="rstBadges">Reset badges</button>
       </div>
     </section>
   </div>
-
-  <!-- collection modal -->
-  <div id="coll" class="hidden">
-    <div class="cpanel">
-      <div class="chead">
-        <h2>Collection <span id="ccount"></span></h2>
-        <button id="cclose" aria-label="Close">&times;</button>
-      </div>
-      <div id="cgrid"></div>
-      <h2 class="sub">Badges <span id="bcount"></span></h2>
-      <div id="blist"></div>
-    </div>
-  </div>
-
-  <div id="toast"></div>
-  <div id="luck"></div>
 
   <!-- start screen -->
   <div id="start">
     <div class="card">
       <h1>Arrascordle</h1>
       <button id="rollStart" disabled>Roll an user</button>
-      <div class="hint">Space / R = roll &middot; C = collection</div>
       <div id="status"></div>
     </div>
   </div>
@@ -301,7 +233,6 @@ try {
         <div class="img" id="img"></div>
         <button id="rollAgain">Roll Again</button>
         <button id="export">Export</button>
-        <div class="hint">Space / R = roll &middot; C = collection</div>
       </div>
       <div class="card right">
         <div class="head">
@@ -323,15 +254,12 @@ try {
         pfp/                   <- 1.png, 2.png, ... (file name = the user's id in users.csv)
     After editing anything in info/, run build.py -> regenerates info/index.js
   */
-  const COOLDOWN = 0;  // seconds
+  const COOLDOWN = 3;  // seconds
   const MSG_POINTS = 1; // points per message sent
   const HISTORY_MAX = 20;
-  // luck / pity: every roll outside the top TOP_N adds 1 pity.
-  // Each pity point makes top-TOP_N users (1 + pity*PITY_STEP)x more likely. At PITY_HARD the next roll is guaranteed top-TOP_N.
-  const TOP_N = 5, PITY_STEP = 0.4, PITY_HARD = 12;
   const $ = id => document.getElementById(id);
   const rollAgain = $("rollAgain"), exportBtn = $("export"), statusEl = $("status");
-  let USERS = [], current = null, last = null, timer = null, LOW = Infinity;
+  let USERS = [], current = null, last = null, timer = null;
   let revealing = false, revTimer = null;
   let best = { name: "", points: -Infinity };
   try { const b = JSON.parse(localStorage.getItem("arrascordle-best")); if (b && b.name) best = b; } catch {}
@@ -367,15 +295,6 @@ try {
   let stats = store.load("stats", null);
   if (!stats || typeof stats !== "object") stats = {};
   stats = { rolls: +stats.rolls || 0, sum: +stats.sum || 0, seen: Array.isArray(stats.seen) ? stats.seen : [] };
-
-  // collection: { userName: timesRolled }  (migrates from the old "seen" list)
-  let coll = store.load("coll", null);
-  if (!coll || typeof coll !== "object" || Array.isArray(coll)) { coll = {}; stats.seen.forEach(n => coll[n] = 1); store.save("coll", coll); }
-  // earned hidden badges: { badgeId: timestamp }
-  let earned = store.load("badges", {});
-  if (!earned || typeof earned !== "object" || Array.isArray(earned)) earned = {};
-  // pity counter: rolls since the last top-TOP_N roll
-  let pity = Math.max(0, parseInt(store.get("pity", "0")) || 0);
 
   // ---------- number format ----------
   function fmt(n) {
@@ -436,14 +355,12 @@ try {
     USERS = data.users.map(d => {
       const achievements = parseList(d.list || "").map(n => master.get(n.toLowerCase()) || { name: n, desc: "", pts: 0 })
         .sort((a, b) => b.pts - a.pts); // largest -> smallest
-      const badgeCount = achievements.length; // real badges only (no "Messages" row)
       const messages = parseInt(d.messages) || 0;
       if (messages > 0) achievements.unshift({ name: "Messages", desc: `Sent ${messages.toLocaleString()} messages in the server.`, pts: messages * MSG_POINTS });
-      return { name: d.name, achievements, badgeCount, image: d.image ? encodeURI(d.image) : null,
+      return { name: d.name, achievements, image: d.image ? encodeURI(d.image) : null,
                points: achievements.reduce((t, a) => t + a.pts, 0) };
     });
     USERS.forEach(u => u.rank = 1 + USERS.filter(o => o.points > u.points).length);
-    LOW = Math.min(...USERS.map(u => u.points));
     $("rollStart").disabled = false;
   }
   init();
@@ -475,130 +392,6 @@ try {
       beep(990, t + at + 0.08, 0.32, "triangle", v);
     } catch {}
   }
-  function playBadge() {
-    if (S.sound !== "on" || S.vol <= 0) return;
-    try {
-      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
-      if (actx.state === "suspended") actx.resume();
-      const t = actx.currentTime + 0.01, v = S.vol * 0.25;
-      [523, 659, 784, 1047].forEach((f, i) => beep(f, t + i * 0.09, 0.28, "triangle", v));
-    } catch {}
-  }
-
-  // ---------- luck / pity ----------
-  function weights() { return USERS.map(u => u.rank <= TOP_N ? 1 + pity * PITY_STEP : 1); }
-  function topOdds() {
-    if (!USERS.length) return 0;
-    if (pity >= PITY_HARD) return 1;
-    const w = weights(), tot = w.reduce((a, b) => a + b, 0);
-    return USERS.reduce((s, u, i) => s + (u.rank <= TOP_N ? w[i] : 0), 0) / tot;
-  }
-  function pickUser() {
-    if (pity >= PITY_HARD) {
-      const pool = USERS.filter(u => u.rank <= TOP_N);
-      return pool[Math.floor(Math.random() * pool.length)];
-    }
-    const w = weights(); let r = Math.random() * w.reduce((a, b) => a + b, 0);
-    for (let i = 0; i < USERS.length; i++) { r -= w[i]; if (r < 0) return USERS[i]; }
-    return USERS[USERS.length - 1];
-  }
-  function updateLuck() {
-    const el = $("luck");
-    if (!USERS.length) { el.classList.add("hidden"); return; }
-    el.classList.remove("hidden");
-    const odds = topOdds();
-    el.textContent = pity >= PITY_HARD
-      ? `\u{1F340} Guaranteed top ${TOP_N} next roll!`
-      : `\u{1F340} Top ${TOP_N} odds ${Math.round(odds * 100)}%` + (pity > 0 ? ` \u00B7 pity ${pity}/${PITY_HARD}` : "");
-    el.classList.toggle("hot", pity > 0);
-    el.title = `Every roll outside the top ${TOP_N} adds pity and boosts your odds of a top ${TOP_N} user. At ${PITY_HARD} pity the next roll is guaranteed.`;
-  }
-
-  // ---------- hidden badges ----------
-  // c = { u, pityBefore, hist (newest first), low, total, seen }
-  const top3 = (c, f) => c.hist.length >= 3 && c.hist.slice(0, 3).every(f);
-  const BADGES = [
-    { id: "underdog",   icon: "\u{1F415}", name: "Underdog",       desc: "Rolled the lowest-scoring user.",              test: c => c.u.points === c.low },
-    { id: "rockbottom", icon: "\u{1FAA8}", name: "Rock Bottom",    desc: "Rolled the lowest-scoring user 3 times in a row.", test: c => top3(c, h => h.points === c.low) },
-    { id: "topdog",     icon: "\u{1F451}", name: "Top Dog",        desc: "Rolled the #1 user.",                          test: c => c.u.rank === 1 },
-    { id: "doubletop",  icon: "\u{1F525}", name: "Double Top",     desc: "Rolled the #1 user twice in a row.",           test: c => c.hist.length >= 2 && c.hist[0].rank === 1 && c.hist[1].rank === 1 },
-    { id: "hoarder",    icon: "\u{1F396}", name: "Badge Hoarder",  desc: "Rolled someone with 5+ badges.",               test: c => c.u.badgeCount >= 5 },
-    { id: "heavy",      icon: "\u{1F4A5}", name: "Heavy Hitter",   desc: "Rolled someone with over 20,000 points.",      test: c => c.u.points > 20000 },
-    { id: "dejavu",     icon: "\u{1F300}", name: "Deja Vu",        desc: "Rolled the same user 3 times in a row.",       test: c => c.hist.length >= 3 && c.hist.slice(0, 3).every(h => h.name === c.hist[0].name) },
-    { id: "hotstreak",  icon: "\u{1F340}", name: "Hot Streak",     desc: `Rolled a top ${TOP_N} user 3 times in a row.`, test: c => top3(c, h => h.rank <= TOP_N) },
-    { id: "climber",    icon: "\u{1F4C8}", name: "Climber",        desc: "Each of 3 rolls scored higher than the last.", test: c => c.hist.length >= 3 && c.hist[0].points > c.hist[1].points && c.hist[1].points > c.hist[2].points },
-    { id: "bounce",     icon: "\u{1F938}", name: "Bounce Back",    desc: "Rolled the lowest user, then the #1 user.",    test: c => c.hist.length >= 2 && c.hist[1].points === c.low && c.hist[0].rank === 1 },
-    { id: "finally",    icon: "\u{1F64F}", name: "Finally!",       desc: "Hit a top user after 10+ rolls of bad luck.",  test: c => c.pityBefore >= 10 && c.u.rank <= TOP_N },
-    { id: "half",       icon: "\u{1F4D8}", name: "Collector",      desc: "Rolled half of all users.",                    test: c => c.seen * 2 >= USERS.length },
-    { id: "complete",   icon: "\u{1F3C6}", name: "Completionist",  desc: "Rolled every single user.",                    test: c => c.seen >= USERS.length },
-    { id: "regular",    icon: "\u{1F3B2}", name: "Regular",        desc: "Rolled 25 times.",                             test: c => c.total >= 25 },
-    { id: "addict",     icon: "\u{1F92A}", name: "Roll Addict",    desc: "Rolled 100 times.",                            test: c => c.total >= 100 },
-    { id: "owl",        icon: "\u{1F989}", name: "Night Owl",      desc: "Rolled between 2 and 5 AM.",                   test: () => { const h = new Date().getHours(); return h >= 2 && h < 5; } },
-  ];
-  function collCount() { return USERS.filter(u => coll[u.name]).length; }
-  function checkBadges(extra) {
-    const c = { ...extra, hist: history, low: LOW, total: stats.rolls, seen: collCount() };
-    const out = [];
-    BADGES.forEach(b => {
-      if (earned[b.id]) return;
-      let ok = false; try { ok = b.test(c); } catch {}
-      if (ok) { earned[b.id] = Date.now(); out.push(b); }
-    });
-    if (out.length) store.save("badges", earned);
-    return out;
-  }
-
-  // toast queue
-  const toasts = []; let toasting = false;
-  function toast(b) { toasts.push(b); if (!toasting) nextToast(); }
-  function nextToast() {
-    const b = toasts.shift(), el = $("toast");
-    if (!b) { toasting = false; return; }
-    toasting = true;
-    el.innerHTML = "";
-    const h = document.createElement("b"); h.textContent = "Hidden badge unlocked";
-    const n = document.createElement("span"); n.textContent = `${b.icon} ${b.name}`;
-    const d = document.createElement("small"); d.textContent = b.desc;
-    el.append(h, n, d);
-    void el.offsetWidth; el.classList.add("show");
-    playBadge();
-    setTimeout(() => { el.classList.remove("show"); setTimeout(nextToast, 450); }, 3400);
-  }
-
-  // ---------- collection ----------
-  function updateColBtn() { $("colN").textContent = `${collCount()}/${USERS.length}`; }
-  function renderColl() {
-    const grid = $("cgrid"); grid.innerHTML = "";
-    USERS.forEach(u => {
-      const n = coll[u.name] || 0;
-      const t = document.createElement("div");
-      t.className = "tile" + (n ? "" : " locked") + (n && u.rank === 1 ? " top" : "") + (n && current === u ? " cur" : "");
-      const im = document.createElement("div"); im.className = "timg";
-      if (u.image) { const i = document.createElement("img"); i.src = u.image; i.alt = ""; im.appendChild(i); }
-      else im.textContent = "?";
-      const tn = document.createElement("div"); tn.className = "tn"; tn.textContent = n ? u.name : "???";
-      const ts = document.createElement("div"); ts.className = "ts"; ts.textContent = n ? `${fmt(u.points)} \u00B7 #${u.rank}` : "Not rolled";
-      t.append(im, tn, ts);
-      if (n > 1) { const c = document.createElement("div"); c.className = "tc"; c.textContent = "\u00D7" + n; t.appendChild(c); }
-      grid.appendChild(t);
-    });
-    $("ccount").textContent = `${collCount()}/${USERS.length}`;
-    const bl = $("blist"); bl.innerHTML = "";
-    BADGES.forEach(b => {
-      const got = earned[b.id];
-      const row = document.createElement("div"); row.className = "bdg" + (got ? "" : " locked");
-      const bi = document.createElement("div"); bi.className = "bi"; bi.textContent = got ? b.icon : "\u{1F512}";
-      const tx = document.createElement("div");
-      const bn = document.createElement("div"); bn.className = "bn"; bn.textContent = got ? b.name : "???";
-      const bd = document.createElement("div"); bd.className = "bd";
-      bd.textContent = got ? `${b.desc} (${new Date(got).toLocaleDateString()})` : "Hidden badge";
-      tx.append(bn, bd); row.append(bi, tx); bl.appendChild(row);
-    });
-    $("bcount").textContent = `${BADGES.filter(b => earned[b.id]).length}/${BADGES.length}`;
-  }
-  const collOpen = () => !$("coll").classList.contains("hidden");
-  function openColl() { renderColl(); $("coll").classList.remove("hidden"); }
-  function closeColl() { $("coll").classList.add("hidden"); }
 
   // ---------- render ----------
   function paint(u, withImg = true) {
@@ -684,32 +477,27 @@ try {
   }
   function renderData() {
     $("stats").textContent = stats.rolls
-      ? `Rolls ${stats.rolls} \u00B7 Avg ${fmt(Math.round(stats.sum / stats.rolls))} \u00B7 Seen ${collCount()}/${USERS.length || "?"}`
+      ? `Rolls ${stats.rolls} · Avg ${fmt(Math.round(stats.sum / stats.rolls))} · Seen ${stats.seen.length}/${USERS.length || "?"}`
       : "No rolls yet.";
     const box = $("hist"); box.innerHTML = "";
     if (!history.length) { box.textContent = "No history yet."; return; }
     history.forEach(h => {
       const row = document.createElement("div");
       const a = document.createElement("span"); a.textContent = h.name;
-      const b = document.createElement("span"); b.textContent = `${fmt(h.points)} \u00B7 #${h.rank}`;
+      const b = document.createElement("span"); b.textContent = `${fmt(h.points)} · #${h.rank}`;
       row.append(a, b); box.appendChild(row);
     });
   }
 
   function roll() {
     if (!USERS.length || Date.now() < nextAt || revealing) return;
-    const pityBefore = pity;
-    current = last = pickUser();
+    let pool = USERS.length > 1 ? USERS.filter(u => u !== last) : USERS;
+    current = last = pool[Math.floor(Math.random() * pool.length)];
     if (current.points > best.points) {
       best = { name: current.name, points: current.points };
       try { localStorage.setItem("arrascordle-best", JSON.stringify(best)); } catch {}
     }
     record(current);
-    pity = current.rank <= TOP_N ? 0 : pity + 1;
-    store.set("pity", String(pity));
-    coll[current.name] = (coll[current.name] || 0) + 1;
-    store.save("coll", coll);
-    const fresh = checkBadges({ u: current, pityBefore });
     nextAt = Date.now() + COOLDOWN * 1000;
     try { localStorage.setItem("arrascordle-next", String(nextAt)); } catch {}
     $("start").classList.add("hidden");
@@ -718,8 +506,6 @@ try {
     const mode = revealMode();
     playRoll(mode === "shuffle");
     reveal(current, mode);
-    // update luck, collection counter and badge toasts once the reveal is done (no spoilers)
-    setTimeout(() => { updateLuck(); updateColBtn(); renderData(); fresh.forEach(toast); }, mode === "shuffle" ? 1400 : 500);
   }
 
   $("rollStart").onclick = roll;
@@ -742,26 +528,6 @@ try {
     exportBtn.textContent = "Copied!";
     setTimeout(() => exportBtn.textContent = "Export", 1200);
   };
-
-  // ---------- keyboard shortcuts ----------
-  document.addEventListener("keydown", e => {
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
-    const t = e.target;
-    if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
-    const k = e.key.toLowerCase();
-    if (k === "escape") { closeColl(); return; }
-    if (k === "c") { collOpen() ? closeColl() : openColl(); return; }
-    if (k === " " || k === "r") {
-      if (collOpen() || !$("settings").classList.contains("hidden")) return;
-      e.preventDefault();
-      if (t && t.tagName === "BUTTON") t.blur(); // stop Space from also "clicking" the focused button
-      if (e.repeat) return;
-      roll();
-    }
-  });
-  $("colBtn").onclick = e => { e.stopPropagation(); collOpen() ? closeColl() : openColl(); };
-  $("cclose").onclick = closeColl;
-  $("coll").onclick = e => { if (e.target === $("coll")) closeColl(); };
 
   // ---------- settings ----------
   (function () {
@@ -789,7 +555,6 @@ try {
     function rerender() {
       if (current && !revealing) render(current);
       renderData();
-      if (collOpen()) renderColl();
     }
 
     document.querySelectorAll(".seg").forEach(seg => {
@@ -825,22 +590,13 @@ try {
       history = []; store.del("history"); renderData();
     };
     $("rstStats").onclick = () => {
-      if (!confirm("Reset your stats? (also resets your pity)")) return;
-      stats = { rolls: 0, sum: 0, seen: [] }; store.del("stats");
-      pity = 0; store.del("pity"); updateLuck(); renderData();
-    };
-    $("rstColl").onclick = () => {
-      if (!confirm("Reset your collection?")) return;
-      coll = {}; store.save("coll", coll); updateColBtn(); renderData(); if (collOpen()) renderColl();
-    };
-    $("rstBadges").onclick = () => {
-      if (!confirm("Reset your hidden badges?")) return;
-      earned = {}; store.save("badges", earned); if (collOpen()) renderColl();
+      if (!confirm("Reset your stats?")) return;
+      stats = { rolls: 0, sum: 0, seen: [] }; store.del("stats"); renderData();
     };
 
     applyTheme(); applyAccent(); applySize();
     ["reveal", "num", "sound"].forEach(markSeg);
-    renderData(); updateLuck(); updateColBtn();
+    renderData();
 
     // panel open/close
     const panel = $("settings"), gear = $("gear");
