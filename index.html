@@ -21,7 +21,7 @@ try {
     --bg:#1f232a; --line:#343840; --card:#15181d; --btn:#171a1f; --btn-b:#1c2026; --btn-h:#1d2127; --btn-a:#12151a;
     --dis:#7d828b; --muted:#8d9096; --row:#181b20; --sub:#c3c8d3; --dash:#3a3f48; --dim:#6f747d; --fg:#fff;
     --pop:#15181d; --pop-b:#2a2f37; color-scheme: dark;
-    --accent:#e0247f; --err:#e0247f; --ok:#1fae6b; --s:1;
+    --accent:#e0247f; --err:#e0247f; --s:1;
   }
   html[data-theme="light"] {
     --bg:#eef0f4; --line:#d5d9e0; --card:#ffffff; --btn:#f3f4f7; --btn-b:#d3d8e0; --btn-h:#e8ebf0; --btn-a:#dde1e8;
@@ -38,17 +38,12 @@ try {
     border-top: 1px solid var(--line);
     color: var(--fg);
     font-family: "Noto Sans", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
-    padding: 20px 16px 40px;
+    padding: 60px 16px 40px;
   }
   .hidden { display: none !important; }
   #status { margin-top: 14px; font-size: 14px; line-height: 20px; color: var(--muted); min-height: 20px; }
   #status.err { color: var(--err); }
   #start .card { width: 270px; }
-
-  /* ---------- nav tabs ---------- */
-  .tabs { display: flex; justify-content: center; gap: 8px; margin: 0 0 36px; padding-right: 0; flex-wrap: wrap; }
-  .tabs button { width: auto; height: 40px; padding: 0 20px; font-size: 15px; }
-  .tabs button.on { border-color: var(--accent); color: var(--accent); }
 
   /* ---------- start screen ---------- */
   #start { display: flex; justify-content: center; }
@@ -124,46 +119,6 @@ try {
   .shuffling #achs { opacity: .5; }
   .shuffling .score, .shuffling #name { filter: blur(.6px); }
 
-  /* ---------- collection ---------- */
-  .prog { max-width: 630px; margin: 0 auto 28px; text-align: center; }
-  .prog .t { font-size: 18px; font-weight: 700; color: var(--sub); margin-bottom: 10px; }
-  .prog.done .t { color: var(--accent); }
-  .bar { height: 14px; background: var(--card); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-  .bar i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 8px; transition: width .6s ease; }
-  .prog.done .bar i { box-shadow: 0 0 14px var(--accent); }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; max-width: 1100px; margin: 0 auto; }
-  .gc { background: var(--card); border-radius: 8px; padding: 16px 12px; text-align: center; cursor: pointer; border: 1px solid transparent; transition: border-color .15s, transform .15s; }
-  .gc:hover { border-color: var(--accent); transform: translateY(-2px); }
-  .gc.unseen { cursor: default; }
-  .gc.unseen:hover { border-color: transparent; transform: none; }
-  .gc .av { position: relative; width: 88px; height: 88px; border-radius: 50%; margin: 0 auto 12px; background: var(--bg); overflow: hidden; display: flex; align-items: center; justify-content: center; color: var(--dim); font-size: 13px; }
-  .gc .av img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .gc.unseen .av img { filter: brightness(0) opacity(.6); }
-  .gc.unseen .av::after { content: "?"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 700; color: var(--dim); }
-  .gc .n { font-weight: 600; font-size: 14px; line-height: 20px; word-break: break-word; }
-  .gc.unseen .n { color: var(--dim); letter-spacing: 2px; }
-  .gc .p { font-size: 12px; color: var(--muted); margin-top: 2px; min-height: 16px; }
-  .conf { position: fixed; top: -40px; z-index: 30; pointer-events: none; animation: fall 2.8s ease-in forwards; }
-  @keyframes fall { to { transform: translateY(115vh) rotate(540deg); } }
-
-  /* ---------- guess ---------- */
-  .gcard { width: 630px; max-width: 100%; margin: 0 auto; padding: 24px; }
-  .gstat { text-align: center; color: var(--muted); font-weight: 700; font-size: 16px; margin: 14px 0 20px; }
-  .gclue { min-height: 120px; margin-bottom: 20px; }
-  .gimg { width: 220px; height: 220px; margin: 0 auto; border-radius: 50%; overflow: hidden; background: var(--bg); border: 2px dashed var(--dash); display: flex; align-items: center; justify-content: center; color: var(--dim); }
-  .gimg img { width: 100%; height: 100%; object-fit: cover; display: block; transition: filter .15s linear; }
-  .gclue .ach { padding: 14px 18px; margin-bottom: 10px; }
-  .gclue .ach .name { font-size: 18px; line-height: 24px; }
-  .gclue .ach .desc { font-size: 15px; line-height: 22px; }
-  .gopts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .gopts button { height: 52px; font-size: 16px; padding: 0 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .gopts button.ok { border-color: var(--ok); color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }
-  .gopts button.bad { border-color: var(--err); color: var(--err); background: color-mix(in srgb, var(--err) 14%, transparent); }
-  .gmsg { text-align: center; min-height: 28px; margin: 16px 0 6px; font-size: 18px; font-weight: 700; }
-  .gmsg.ok { color: var(--ok); } .gmsg.bad { color: var(--err); }
-  .gbtns { display: flex; gap: 12px; margin-top: 10px; }
-  .gbtns button { height: 42px; font-size: 15px; }
-
   /* ---------- settings ---------- */
   #gear { position: fixed; top: 14px; right: 14px; z-index: 20; width: 42px; height: 42px; padding: 0; font-size: 20px; line-height: 1; border-radius: 50%; }
   #settings {
@@ -174,10 +129,9 @@ try {
   }
   #settings section + section { margin-top: 18px; }
   #settings h3 { margin: 0 0 8px; font-size: 13px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); }
-  .seg, .seg2 { display: flex; gap: 8px; }
-  .seg button, .seg2 button { height: 36px; font-size: 14px; }
-  .seg button.on, .seg2 button.on { border-color: var(--accent); color: var(--accent); }
-  .seg2 { max-width: 420px; margin: 0 auto; }
+  .seg { display: flex; gap: 8px; }
+  .seg button { height: 36px; font-size: 14px; }
+  .seg button.on { border-color: var(--accent); color: var(--accent); }
 
   .sw { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   .sw button { width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 2px solid var(--btn-b); }
@@ -257,73 +211,35 @@ try {
         <button id="rstBest">Reset best roll</button>
         <button id="rstHist">Reset history</button>
         <button id="rstStats">Reset stats</button>
-        <button id="rstGuess">Reset guess stats</button>
       </div>
     </section>
   </div>
 
-  <!-- nav -->
-  <nav class="tabs" id="tabs">
-    <button data-view="roll" class="on">Roll</button>
-    <button data-view="coll">Collection</button>
-    <button data-view="guess">Guess</button>
-  </nav>
-
-  <!-- ROLL VIEW -->
-  <div id="rollView">
-    <!-- start screen -->
-    <div id="start">
-      <div class="card">
-        <h1>Arrascordle</h1>
-        <button id="rollStart" disabled>Roll an user</button>
-        <div id="status"></div>
-      </div>
-    </div>
-
-    <!-- result screen -->
-    <div id="result" class="hidden">
-      <div id="best"></div>
-      <div class="layout" id="layout">
-        <div class="card left">
-          <h2 id="name"></h2>
-          <div class="img" id="img"></div>
-          <button id="rollAgain">Roll Again</button>
-          <button id="export">Export</button>
-        </div>
-        <div class="card right">
-          <div class="head">
-            <div class="score" id="score"></div>
-            <div class="rank" id="rank"></div>
-          </div>
-          <div id="achs"></div>
-        </div>
-      </div>
+  <!-- start screen -->
+  <div id="start">
+    <div class="card">
+      <h1>Arrascordle</h1>
+      <button id="rollStart" disabled>Roll an user</button>
+      <div id="status"></div>
     </div>
   </div>
 
-  <!-- COLLECTION VIEW -->
-  <div id="collView" class="hidden">
-    <div class="prog" id="prog">
-      <div class="t" id="progText"></div>
-      <div class="bar"><i id="progBar"></i></div>
-    </div>
-    <div class="grid" id="grid"></div>
-  </div>
-
-  <!-- GUESS VIEW -->
-  <div id="guessView" class="hidden">
-    <div class="seg2" id="gmode">
-      <button data-v="ach">Guess by achievements</button>
-      <button data-v="pfp">Guess by blurred pfp</button>
-    </div>
-    <div class="gstat" id="gstat"></div>
-    <div class="card gcard">
-      <div class="gclue" id="gclue"></div>
-      <div class="gopts" id="gopts"></div>
-      <div class="gmsg" id="gmsg"></div>
-      <div class="gbtns">
-        <button id="gmore">More clues</button>
-        <button id="gnext" disabled>Next</button>
+  <!-- result screen -->
+  <div id="result" class="hidden">
+    <div id="best"></div>
+    <div class="layout" id="layout">
+      <div class="card left">
+        <h2 id="name"></h2>
+        <div class="img" id="img"></div>
+        <button id="rollAgain">Roll Again</button>
+        <button id="export">Export</button>
+      </div>
+      <div class="card right">
+        <div class="head">
+          <div class="score" id="score"></div>
+          <div class="rank" id="rank"></div>
+        </div>
+        <div id="achs"></div>
       </div>
     </div>
   </div>
@@ -379,10 +295,6 @@ try {
   let stats = store.load("stats", null);
   if (!stats || typeof stats !== "object") stats = {};
   stats = { rolls: +stats.rolls || 0, sum: +stats.sum || 0, seen: Array.isArray(stats.seen) ? stats.seen : [] };
-
-  let gs = store.load("gstats", null);
-  if (!gs || typeof gs !== "object") gs = {};
-  gs = { best: +gs.best || 0, played: +gs.played || 0, correct: +gs.correct || 0 };
 
   // ---------- number format ----------
   function fmt(n) {
@@ -480,16 +392,6 @@ try {
       beep(990, t + at + 0.08, 0.32, "triangle", v);
     } catch {}
   }
-  function playWrong() {
-    if (S.sound !== "on" || S.vol <= 0) return;
-    try {
-      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
-      if (actx.state === "suspended") actx.resume();
-      const t = actx.currentTime + 0.01, v = S.vol * 0.2;
-      beep(220, t, 0.18, "sawtooth", v);
-      beep(165, t + 0.14, 0.3, "sawtooth", v);
-    } catch {}
-  }
 
   // ---------- render ----------
   function paint(u, withImg = true) {
@@ -569,17 +471,13 @@ try {
     history.unshift({ name: u.name, points: u.points, rank: u.rank });
     if (history.length > HISTORY_MAX) history.length = HISTORY_MAX;
     stats.rolls++; stats.sum += u.points;
-    const hadAll = USERS.length > 0 && USERS.every(x => stats.seen.includes(x.name));
     if (!stats.seen.includes(u.name)) stats.seen.push(u.name);
     store.save("history", history); store.save("stats", stats);
     renderData();
-    if (!hadAll && isComplete()) party();
   }
-  function seenCount() { return USERS.filter(u => stats.seen.includes(u.name)).length; }
-  function isComplete() { return USERS.length > 0 && seenCount() === USERS.length; }
   function renderData() {
     $("stats").textContent = stats.rolls
-      ? `Rolls ${stats.rolls} · Avg ${fmt(Math.round(stats.sum / stats.rolls))} · Seen ${seenCount()}/${USERS.length || "?"}`
+      ? `Rolls ${stats.rolls} · Avg ${fmt(Math.round(stats.sum / stats.rolls))} · Seen ${stats.seen.length}/${USERS.length || "?"}`
       : "No rolls yet.";
     const box = $("hist"); box.innerHTML = "";
     if (!history.length) { box.textContent = "No history yet."; return; }
@@ -631,145 +529,6 @@ try {
     setTimeout(() => exportBtn.textContent = "Export", 1200);
   };
 
-  // ---------- views / nav ----------
-  function showView(v) {
-    ["roll", "coll", "guess"].forEach(x => $(x + "View").classList.toggle("hidden", x !== v));
-    document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.view === v));
-    clearInterval(G.blurT);
-    if (v === "coll") renderColl();
-    if (v === "guess") gNew();
-  }
-  document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => showView(b.dataset.view));
-
-  // ---------- collection ----------
-  function party() {
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const em = ["🎉", "✨", "🎊"];
-    for (let i = 0; i < 45; i++) {
-      const s = document.createElement("span");
-      s.textContent = em[i % 3]; s.className = "conf";
-      s.style.left = Math.random() * 100 + "vw";
-      s.style.animationDelay = Math.random() * 0.9 + "s";
-      s.style.fontSize = 16 + Math.random() * 22 + "px";
-      document.body.appendChild(s);
-      setTimeout(() => s.remove(), 4000);
-    }
-  }
-  function renderColl() {
-    const total = USERS.length, seen = seenCount(), done = isComplete();
-    $("progText").textContent = `Seen ${seen}/${total}` + (done ? " 🎉" : "");
-    $("prog").classList.toggle("done", done);
-    $("progBar").style.width = (total ? seen / total * 100 : 0) + "%";
-    const grid = $("grid"); grid.innerHTML = "";
-    // seen first (by points desc), unseen after, so progress reads naturally
-    const sorted = USERS.slice().sort((a, b) => {
-      const sa = stats.seen.includes(a.name), sb = stats.seen.includes(b.name);
-      return sa === sb ? b.points - a.points : sa ? -1 : 1;
-    });
-    sorted.forEach(u => {
-      const isSeen = stats.seen.includes(u.name);
-      const c = document.createElement("div"); c.className = "gc" + (isSeen ? "" : " unseen");
-      const av = document.createElement("div"); av.className = "av";
-      if (u.image) { const i = document.createElement("img"); i.src = u.image; i.alt = ""; av.appendChild(i); }
-      const n = document.createElement("div"); n.className = "n"; n.textContent = isSeen ? u.name : "???";
-      const p = document.createElement("div"); p.className = "p"; p.textContent = isSeen ? `${fmt(u.points)} · #${u.rank}` : "";
-      c.append(av, n, p);
-      if (isSeen) c.onclick = () => {
-        current = u;
-        $("start").classList.add("hidden"); $("result").classList.remove("hidden");
-        render(u); showView("roll");
-      };
-      grid.appendChild(c);
-    });
-    if (done && !renderColl.partied) { renderColl.partied = true; party(); }
-  }
-
-  // ---------- guess game ----------
-  const G = { mode: pick(store.get("gmode"), ["ach", "pfp"], "ach"), streak: 0, target: null, answered: false, blurT: null, clues: 3, blur: 0 };
-  const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-  function gStat() {
-    $("gstat").textContent = `Streak ${G.streak} · Best ${gs.best} · ` +
-      (gs.played ? `${gs.correct}/${gs.played} correct` : "No guesses yet");
-  }
-  function gClue() {
-    const box = $("gclue"); box.innerHTML = "";
-    const t = G.target;
-    if (G.mode === "pfp") {
-      const w = document.createElement("div"); w.className = "gimg";
-      if (t.image) {
-        const i = document.createElement("img"); i.src = t.image; i.alt = ""; i.id = "gpic";
-        i.style.filter = `blur(${G.blur}px)`; w.appendChild(i);
-      } else w.textContent = "no image";
-      box.appendChild(w);
-    } else {
-      t.achievements.slice(0, G.clues).forEach(a => {
-        const row = document.createElement("div"); row.className = "ach";
-        const l = document.createElement("div");
-        const n = document.createElement("div"); n.className = "name"; n.textContent = a.name;
-        const d = document.createElement("div"); d.className = "desc"; d.textContent = a.desc;
-        l.append(n, d); row.appendChild(l); box.appendChild(row);
-      });
-      if (!t.achievements.length) box.textContent = "This user has no achievements. Good luck!";
-    }
-    const more = $("gmore");
-    more.classList.toggle("hidden", G.mode === "pfp");
-    more.disabled = G.answered || G.clues >= t.achievements.length;
-  }
-  function gNew() {
-    clearInterval(G.blurT);
-    const opts = $("gopts"), msg = $("gmsg"), next = $("gnext");
-    opts.innerHTML = ""; msg.textContent = ""; msg.className = "gmsg"; next.disabled = true;
-    gStat();
-    if (USERS.length < 2) { $("gclue").textContent = "Need at least 2 users to play."; $("gmore").classList.add("hidden"); return; }
-    document.querySelectorAll("#gmode button").forEach(b => b.classList.toggle("on", b.dataset.v === G.mode));
-    let pool = G.mode === "pfp" ? USERS.filter(u => u.image) : USERS;
-    if (!pool.length) { $("gclue").textContent = "No profile pictures available for this mode."; $("gmore").classList.add("hidden"); return; }
-    if (pool.length > 1) pool = pool.filter(u => u !== G.target);
-    G.target = pool[Math.floor(Math.random() * pool.length)];
-    G.answered = false; G.clues = 3; G.blur = 26;
-    const choices = shuffle([G.target, ...shuffle(USERS.filter(u => u !== G.target)).slice(0, 3)]);
-    choices.forEach(u => {
-      const b = document.createElement("button"); b.textContent = u.name; b.dataset.n = USERS.indexOf(u);
-      b.onclick = () => gAnswer(u, b);
-      opts.appendChild(b);
-    });
-    gClue();
-    if (G.mode === "pfp") {
-      const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-      G.blurT = setInterval(() => {
-        G.blur = Math.max(0, G.blur - 26 / 150); // ~15s to fully clear
-        const p = $("gpic"); if (p) p.style.filter = `blur(${G.blur}px)`;
-        if (G.blur <= 0) clearInterval(G.blurT);
-      }, reduce ? 200 : 100);
-    }
-  }
-  function gAnswer(u, btn) {
-    if (G.answered) return;
-    G.answered = true; clearInterval(G.blurT);
-    const ok = u === G.target, msg = $("gmsg");
-    gs.played++;
-    if (ok) { G.streak++; gs.correct++; if (G.streak > gs.best) gs.best = G.streak; }
-    else G.streak = 0;
-    store.save("gstats", gs);
-    document.querySelectorAll("#gopts button").forEach(b => {
-      b.disabled = true;
-      if (USERS[+b.dataset.n] === G.target) b.classList.add("ok");
-    });
-    if (!ok) btn.classList.add("bad");
-    msg.className = "gmsg " + (ok ? "ok" : "bad");
-    msg.textContent = ok ? "Correct!" : `It was ${G.target.name}`;
-    const p = $("gpic"); if (p) p.style.filter = "none";
-    if (G.mode === "ach") { G.clues = G.target.achievements.length; gClue(); }
-    $("gmore").disabled = true; $("gnext").disabled = false;
-    gStat();
-    if (ok) playRoll(false); else playWrong();
-  }
-  $("gnext").onclick = gNew;
-  $("gmore").onclick = () => { if (!G.answered) { G.clues++; gClue(); } };
-  document.querySelectorAll("#gmode button").forEach(b => b.onclick = () => {
-    G.mode = b.dataset.v; store.set("gmode", G.mode); G.streak = 0; gNew();
-  });
-
   // ---------- settings ----------
   (function () {
     const root = document.documentElement;
@@ -796,7 +555,6 @@ try {
     function rerender() {
       if (current && !revealing) render(current);
       renderData();
-      if (!$("collView").classList.contains("hidden")) renderColl();
     }
 
     document.querySelectorAll(".seg").forEach(seg => {
@@ -832,12 +590,8 @@ try {
       history = []; store.del("history"); renderData();
     };
     $("rstStats").onclick = () => {
-      if (!confirm("Reset your stats? This also clears your collection.")) return;
-      stats = { rolls: 0, sum: 0, seen: [] }; store.del("stats"); renderColl.partied = false; rerender();
-    };
-    $("rstGuess").onclick = () => {
-      if (!confirm("Reset your guess stats?")) return;
-      gs = { best: 0, played: 0, correct: 0 }; G.streak = 0; store.del("gstats"); gStat();
+      if (!confirm("Reset your stats?")) return;
+      stats = { rolls: 0, sum: 0, seen: [] }; store.del("stats"); renderData();
     };
 
     applyTheme(); applyAccent(); applySize();
