@@ -124,7 +124,7 @@ window.INFO = {
   {
    "name": "Appeaser",
    "image": "info/pfp/25.png",
-   "list": "Pentagon\nTriangle\nSquare\nEgg"
+   "list": "Certified Arras.io Tank\nPentagon\nTriangle\nSquare\nEgg"
   }
  ],
  "music": [
